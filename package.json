@@ -1,0 +1,30 @@
+{
+  "name": "playwright-testdino-jenkins-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-contained Playwright and TestDino example for Jenkins.",
+  "scripts": {
+    "test": "playwright test",
+    "test:ci": "playwright test",
+    "lint": "eslint . --ext .js,.ts",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "playwright",
+    "testdino",
+    "jenkins",
+    "ci",
+    "e2e"
+  ],
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-playwright": "^2.10.1",
+    "prettier": "^3.8.1",
+    "tdpw": "^1.0.33"
+  }
+}
