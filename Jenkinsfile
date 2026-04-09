@@ -28,7 +28,7 @@ pipeline {
                                 unstash 'source'
                                 bat 'npm ci'
                                 script {
-                                    int exitCode = bat(returnStatus: true, script: 'npx playwright test --shard=1/4')
+                                    int exitCode = bat(returnStatus: true, script: 'npx playwright test --shard=1/2')
                                     stash includes: 'blob-report/**', name: 'blob-report-1', allowEmpty: true
                                     junit allowEmptyResults: true, testResults: 'test-results/junit.xml'
                                     if (exitCode != 0) {
@@ -47,49 +47,11 @@ pipeline {
                                 unstash 'source'
                                 bat 'npm ci'
                                 script {
-                                    int exitCode = bat(returnStatus: true, script: 'npx playwright test --shard=2/4')
+                                    int exitCode = bat(returnStatus: true, script: 'npx playwright test --shard=2/2')
                                     stash includes: 'blob-report/**', name: 'blob-report-2', allowEmpty: true
                                     junit allowEmptyResults: true, testResults: 'test-results/junit.xml'
                                     if (exitCode != 0) {
                                         unstable('Playwright shard 2 reported test failures.')
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                stage('Shard 3') {
-                    steps {
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                            dir('shard-3') {
-                                unstash 'source'
-                                bat 'npm ci'
-                                script {
-                                    int exitCode = bat(returnStatus: true, script: 'npx playwright test --shard=3/4')
-                                    stash includes: 'blob-report/**', name: 'blob-report-3', allowEmpty: true
-                                    junit allowEmptyResults: true, testResults: 'test-results/junit.xml'
-                                    if (exitCode != 0) {
-                                        unstable('Playwright shard 3 reported test failures.')
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                stage('Shard 4') {
-                    steps {
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                            dir('shard-4') {
-                                unstash 'source'
-                                bat 'npm ci'
-                                script {
-                                    int exitCode = bat(returnStatus: true, script: 'npx playwright test --shard=4/4')
-                                    stash includes: 'blob-report/**', name: 'blob-report-4', allowEmpty: true
-                                    junit allowEmptyResults: true, testResults: 'test-results/junit.xml'
-                                    if (exitCode != 0) {
-                                        unstable('Playwright shard 4 reported test failures.')
                                     }
                                 }
                             }
@@ -106,7 +68,7 @@ pipeline {
                         unstash 'source'
                         bat 'npm ci'
                         script {
-                            ['1', '2', '3', '4'].each { shard ->
+                            ['1', '2'].each { shard ->
                                 try {
                                     dir("shard-${shard}") {
                                         unstash "blob-report-${shard}"
@@ -119,7 +81,7 @@ pipeline {
                         bat '''
                             if not exist all-blob-reports mkdir all-blob-reports
                             if not exist playwright-report mkdir playwright-report
-                            for %%D in (shard-1 shard-2 shard-3 shard-4) do (
+                            for %%D in (shard-1 shard-2) do (
                                 if exist "%%D\\blob-report\\*" copy /Y "%%D\\blob-report\\*" "all-blob-reports\\" >nul
                             )
                         '''
