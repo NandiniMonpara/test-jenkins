@@ -88,7 +88,7 @@ pipeline {
                         script {
                             int mergeExit = bat(returnStatus: true, script: '''
                                 if not exist "all-blob-reports\\*" exit /b 1
-                                npx playwright merge-reports --reporter=json .\\all-blob-reports > playwright-report\\report.json
+                                npx playwright merge-reports -c .\\playwright.merge.config.ts --reporter=json .\\all-blob-reports > playwright-report\\report.json
                             ''')
                             if (mergeExit != 0) {
                                 unstable('Merged Playwright report was not created.')
@@ -97,6 +97,7 @@ pipeline {
                         script {
                             int uploadExit = bat(returnStatus: true, script: '''
                                 if not exist "playwright-report\\report.json" exit /b 0
+                                for %%F in ("playwright-report\\report.json") do if %%~zF EQU 0 exit /b 0
                                 npx tdpw upload .\\playwright-report --token="%TESTDINO_TOKEN%"
                             ''')
                             if (uploadExit != 0) {
