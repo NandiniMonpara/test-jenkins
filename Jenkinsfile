@@ -98,7 +98,20 @@ pipeline {
                             int uploadExit = bat(returnStatus: true, script: '''
                                 if not exist "playwright-report\\report.json" exit /b 0
                                 for %%F in ("playwright-report\\report.json") do if %%~zF EQU 0 exit /b 0
-                                npx tdpw upload .\\playwright-report --token="%TESTDINO_TOKEN%"
+                                call npx tdpw upload .\\playwright-report --token="%TESTDINO_TOKEN%" > upload.log 2>&1
+                                set UPLOAD_EXIT=%ERRORLEVEL%
+                                type upload.log
+                                findstr /C:"Upload completed successfully!" upload.log >nul
+                                if not errorlevel 1 (
+                                    echo TestDino upload confirmed.
+                                    exit /b 0
+                                )
+                                findstr /C:"Report uploaded successfully" upload.log >nul
+                                if not errorlevel 1 (
+                                    echo TestDino upload confirmed.
+                                    exit /b 0
+                                )
+                                exit /b %UPLOAD_EXIT%
                             ''')
                             if (uploadExit != 0) {
                                 unstable('Uploading results to TestDino failed.')
